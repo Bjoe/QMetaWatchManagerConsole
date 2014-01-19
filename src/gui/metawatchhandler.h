@@ -4,7 +4,6 @@
 #include <QObject>
 #include <QIODevice>
 
-#include "core/devicehandler.h"
 #include "core/protocoldispatcher.h"
 #include "devicetypemessage.h"
 #include "watchpropertyoperationmessage.h"

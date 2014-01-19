@@ -20,13 +20,13 @@ private slots:
 void WatchPropertOperationMessageTest::testCreateRequest()
 {
     qmwp::WatchPropertyOperationMessage message;
-    message.setClockFormat(qmwp::WatchPropertyOperationMessage::ClockFormat::H24);
-    message.setDateFormat(qmwp::WatchPropertyOperationMessage::DateFormat::DDMM);
+    message.setClockFormatChecked(true);
+    message.setDateFormatChecked(true);
 
     qmwp::core::Protocol protocol = message.createProtocol();
 
     QCOMPARE(protocol.type(), static_cast<quint8>(0x30));
-    QCOMPARE(protocol.option(), static_cast<quint8>(0x83));
+    QCOMPARE(protocol.option(), static_cast<quint8>(0x03));
 }
 
 void WatchPropertOperationMessageTest::testResponse()
@@ -38,8 +38,11 @@ void WatchPropertOperationMessageTest::testResponse()
     message.handle(protocol);
 
     QCOMPARE(message.responseType(), 0x31);
+    QVERIFY(message.clockFormatChecked());
     QVERIFY(message.clockFormat() == qmwp::WatchPropertyOperationMessage::ClockFormat::H24);
+    QVERIFY(message.dateFormatChecked());
     QVERIFY(message.dateFormat() == qmwp::WatchPropertyOperationMessage::DateFormat::DDMM);
+    QVERIFY(message.autoBacklightChecked() == false);
     QVERIFY(message.autoBacklight() == qmwp::WatchPropertyOperationMessage::Backlight::DISABLE);
 }
 

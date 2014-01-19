@@ -26,7 +26,7 @@ MainWindowController *MainWindowController::createInstance(const QString &qmlUrl
     qmlRegisterType<qmwm::gui::BluetoothDiscoveryModel>("QMetaWatchManager", 1, 0, "BluetoothDiscoveryModel");
     qmlRegisterType<qmwm::gui::MetaWatchHandler>("QMetaWatchManager", 1, 0, "MetaWatchHandler");
     qmlRegisterType<qmwp::DeviceTypeMessage>("QMetaWatchManager", 1, 0, "DeviceTypeMessage");
-    //qmlRegisterType<qmwp::WatchPropertyOperationMessage>("QMetaWatchManager", 1, 0, "WatchPropertyOperationMessage");
+    qmlRegisterType<qmwp::WatchPropertyOperationMessage>("QMetaWatchManager", 1, 0, "WatchPropertyOperationMessage");
 
     QQmlApplicationEngine* engine = new QQmlApplicationEngine();
     initContext(engine);

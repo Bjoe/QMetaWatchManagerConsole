@@ -16,24 +16,37 @@ class ProtocolDispatcherTest : public QObject
     Q_OBJECT
 
 private slots:
-    void testExample();
+    void testDispatch();
+    void testDoNothing();
 };
 
-void ProtocolDispatcherTest::testExample()
+void ProtocolDispatcherTest::testDispatch()
 {
     qmwp::core::ProtocolDispatcher dispatcher;
-
     qmwp::DeviceTypeMessage message;
-
     dispatcher.addHandler(&message);
 
     qmwp::core::Protocol protocol;
     protocol.setType(0x02);
-    protocol.setOption(0x05);
+    QByteArray payload;
+    payload[0] = 0x05;
+    protocol.setPayload(payload);
 
     dispatcher.dispatch(protocol);
 
     QVERIFY(message.deviceType() == qmwp::DeviceTypeMessage::Type::DIGITAL_WATCH_GEN2);
+}
+
+void ProtocolDispatcherTest::testDoNothing()
+{
+    qmwp::core::ProtocolDispatcher dispatcher;
+    qmwp::DeviceTypeMessage message;
+    dispatcher.addHandler(&message);
+
+    qmwp::core::Protocol protocol;
+    protocol.setType(0x00);
+
+    dispatcher.dispatch(protocol);
 }
 
 }

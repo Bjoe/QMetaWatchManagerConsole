@@ -1,6 +1,5 @@
 
 set(QT_SRCS
-    core/devicehandler.cpp
     core/metawatchprotocol.cpp
     core/metawatchmessage.cpp
     core/protocoldispatcher.cpp

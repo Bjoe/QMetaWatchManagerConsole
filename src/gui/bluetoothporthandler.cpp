@@ -12,7 +12,7 @@ namespace qmwm {
 namespace gui {
 
 BluetoothPortHandler::BluetoothPortHandler(QObject *parent) :
-    QObject(parent), m_localDevice{new QBluetoothLocalDevice(parent)}, m_socket{nullptr}, m_deviceHandler{nullptr}
+    QObject(parent)
 {
     connect(m_localDevice, SIGNAL(pairingFinished(QBluetoothAddress,QBluetoothLocalDevice::Pairing)), SLOT(onPairingFinished(QBluetoothAddress,QBluetoothLocalDevice::Pairing)));
     connect(m_localDevice, SIGNAL(pairingDisplayConfirmation(QBluetoothAddress,QString)), SLOT(onPairingDisplayConfirmation(QBluetoothAddress,QString)));
@@ -23,9 +23,6 @@ BluetoothPortHandler::~BluetoothPortHandler()
 {
     if(m_socket) {
         delete m_socket;
-    }
-    if(m_deviceHandler) {
-        delete m_deviceHandler;
     }
 }
 
@@ -49,75 +46,43 @@ void BluetoothPortHandler::onConnectToDevice(BluetoothDiscoveryModel* model, int
     connect(m_socket, SIGNAL(error(QBluetoothSocket::SocketError)), this, SLOT(onError(QBluetoothSocket::SocketError)));
     connect(m_socket, SIGNAL(stateChanged(QBluetoothSocket::SocketState)), this, SLOT(onState(QBluetoothSocket::SocketState)));
 
-    m_deviceHandler = new DeviceHandler(m_socket, this);
-    connect(m_socket, SIGNAL(readyRead()), m_deviceHandler, SLOT(onReadyRead()));
-
     m_socket->connectToService(*service);
 }
 
-void BluetoothPortHandler::onSend()
+void BluetoothPortHandler::onError(QBluetoothSocket::SocketError socketError)
 {
-    if(m_deviceHandler) {
-        m_deviceHandler->write();
-    }
-}
-
-void BluetoothPortHandler::onSendClock()
-{
-    if(m_deviceHandler) {
-        qmwp::RealTimeClockMessage message;
-        m_deviceHandler->send(message);
-    }
-}
-
-void BluetoothPortHandler::onSendProperty()
-{
-    if(m_deviceHandler) {
-        qmwp::WatchPropertyOperationMessage message;
-        message.setClockFormat(qmwp::WatchPropertyOperationMessage::ClockFormat::H24);
-        message.setDateFormat(qmwp::WatchPropertyOperationMessage::DateFormat::DDMM);
-        m_deviceHandler->send(message);
-    }
-}
-
-void BluetoothPortHandler::onSendDeviceType()
-{
-    if(m_deviceHandler) {
-        qmwp::DeviceTypeMessage message;
-        m_deviceHandler->send(message);
-    }
-}
-
-void BluetoothPortHandler::onError(QBluetoothSocket::SocketError error)
-{
-    qDebug() << "Error: " << error;
+    qDebug() << "Error: " << socketError;
+    emit error(QString("Socket error: %1").arg(socketError));
 }
 
 void BluetoothPortHandler::onState(QBluetoothSocket::SocketState state)
 {
     qDebug() << "State: " << state;
+    emit statusMessage(QString("State : %1").arg(state));
 }
 
 void BluetoothPortHandler::onPairingFinished(const QBluetoothAddress &address, QBluetoothLocalDevice::Pairing pairing)
 {
     qDebug() << "Pairing: " << pairing;
-
+    emit statusMessage(QString("Pairing: %1 Address: %2").arg(pairing).arg(address.toString()));
 }
 
 void BluetoothPortHandler::onPairingDisplayConfirmation(const QBluetoothAddress &address, QString pin)
 {
     qDebug() << " Device Address: " << address.toString() << " PIN: " << pin;
+    emit statusMessage(QString("Device Address %1 PIN: %2").arg(address.toString()).arg(pin));
     m_localDevice->pairingConfirmation(true);
 }
 
-void BluetoothPortHandler::onPairingError(QBluetoothLocalDevice::Error error)
+void BluetoothPortHandler::onPairingError(QBluetoothLocalDevice::Error deviceError)
 {
-    qDebug() << "Error: " << error;
+    qDebug() << "Error: " << deviceError;
+    emit error(QString("Pairing error: %1").arg(deviceError));
 }
 
 void BluetoothPortHandler::onConnected()
 {
-    emit connected(m_socket->peerName());
+    emit connected(m_socket);
 }
 
 } // namespace gui

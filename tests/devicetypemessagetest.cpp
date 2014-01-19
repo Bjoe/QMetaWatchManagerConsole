@@ -1,6 +1,8 @@
 
 #include <QtTest/QtTest>
 
+#include <QByteArray>
+
 #include "testconfig.h"
 
 #include "devicetypemessage.h"
@@ -31,7 +33,10 @@ void DeviceTypeMessageTest::testCreateResponse()
     qmwp::DeviceTypeMessage message;
 
     qmwp::core::Protocol protocol;
-    protocol.setOption(0x05);
+    //protocol.setOption(0x05);
+    QByteArray payload;
+    payload[0] = 0x05;
+    protocol.setPayload(payload);
 
     message.handle(protocol);
 

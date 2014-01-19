@@ -1,5 +1,7 @@
 #include "serialporthandler.h"
 
+#include <QByteArray>
+#include <QRegExp>
 #include <QIODevice>
 #include <QSerialPortInfo>
 #include <QSerialPort>
@@ -12,10 +14,9 @@ namespace gui {
 SerialPortHandler::SerialPortHandler(QObject *parent) :
     QObject(parent),
     m_serialPort(new QSerialPort(parent)),
-    m_deviceHandler(new DeviceHandler(m_serialPort, parent)),
     m_model(new PortInfoModel(parent))
 {
-    connect(m_serialPort, SIGNAL(readyRead()), m_deviceHandler, SLOT(onReadyRead()));
+    connect(m_serialPort, &QSerialPort::readyRead, this, &SerialPortHandler::onReadyRead);
 }
 
 PortInfoModel* SerialPortHandler::model()
@@ -50,9 +51,20 @@ void SerialPortHandler::onConnectPort(int index)
     check([](QSerialPort* serialPort) -> bool { return serialPort->setFlowControl(QSerialPort::NoFlowControl); });
 }
 
-void SerialPortHandler::onSend()
+void SerialPortHandler::onSend(const QString& command)
 {
-    m_deviceHandler->write();
+    QByteArray bytes;
+    bytes.append(command + "\r");
+    m_serialPort->write(bytes);
+}
+
+void SerialPortHandler::onReadyRead()
+{
+    while(m_serialPort->canReadLine()) {
+        QByteArray bytes = m_serialPort->readLine();
+        QString data = QString(bytes.data()).simplified();
+        emit output(data);
+    }
 }
 
 void SerialPortHandler::check(std::function<bool(QSerialPort *)> func)
@@ -61,7 +73,8 @@ void SerialPortHandler::check(std::function<bool(QSerialPort *)> func)
     if(ok == false) {
         m_serialPort->close();
         QString message = m_serialPort->errorString();
-        qDebug() << "Error: " << message;
+        qDebug() << "Serial Error: " << message;
+        emit error(QString("Serial Error: %1").arg(message));
     }
 }
 

@@ -9,7 +9,6 @@
 #include <QtBluetooth/QBluetoothSocket>
 #include <QtBluetooth/QBluetoothLocalDevice>
 
-#include "core/devicehandler.h"
 #include "gui/bluetoothdiscoverymodel.h"
 
 namespace qmwm {
@@ -23,28 +22,25 @@ public:
     ~BluetoothPortHandler();
 
 signals:
-    void connected(const QString &message);
+    void connected(QIODevice* device);
     void disconnected();
+    void error(QString message);
+    void statusMessage(QString message);
 
 public slots:
     void onConnectToDevice(BluetoothDiscoveryModel* model, int row);
-    void onSend();
-    void onSendClock();
-    void onSendProperty();
-    void onSendDeviceType();
 
 private slots:
     void onConnected();
-    void onError(QBluetoothSocket::SocketError error);
+    void onError(QBluetoothSocket::SocketError socketError);
     void onState(QBluetoothSocket::SocketState state);
     void onPairingFinished(const QBluetoothAddress& address, QBluetoothLocalDevice::Pairing pairing);
     void onPairingDisplayConfirmation(const QBluetoothAddress& address, QString pin);
-    void onPairingError(QBluetoothLocalDevice::Error error);
+    void onPairingError(QBluetoothLocalDevice::Error deviceError);
 
 private:
-    QBluetoothLocalDevice* m_localDevice;
-    QBluetoothSocket* m_socket;
-    DeviceHandler* m_deviceHandler;
+    QBluetoothLocalDevice* m_localDevice{new QBluetoothLocalDevice(this)};
+    QBluetoothSocket* m_socket{nullptr};
 };
 
 } // namespace gui

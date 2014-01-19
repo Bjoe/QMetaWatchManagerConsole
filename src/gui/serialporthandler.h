@@ -6,7 +6,6 @@
 #include <QSerialPort>
 
 #include "gui/portinfomodel.h"
-#include "core/devicehandler.h"
 
 namespace qmwm {
 namespace gui {
@@ -27,14 +26,18 @@ public:
 public slots:
     void onRefresh();
     void onConnectPort(int index);
-    void onSend();
+    void onSend(const QString &command);
 
 signals:
+    void output(QString data);
     void modelChanged();
+    void error(QString message);
+
+private slots:
+    void onReadyRead();
 
 private:
     QSerialPort* m_serialPort;
-    DeviceHandler* m_deviceHandler;
     PortInfoModel* m_model;
 
     void check(std::function<bool(QSerialPort* serialPort)> func);

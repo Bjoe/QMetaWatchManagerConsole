@@ -1,5 +1,7 @@
 #include "metawatchhandler.h"
 
+#include <QDebug>
+
 #include "realtimeclockmessage.h"
 
 namespace qmwm {

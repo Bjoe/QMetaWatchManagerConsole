@@ -11,8 +11,9 @@ namespace qmwp {
 class DeviceTypeMessage : public QObject, public core::Message
 {
     Q_OBJECT
-    Q_ENUMS(qmwp::DeviceTypeMessage::Type)
-    Q_PROPERTY(qmwp::DeviceTypeMessage::Type deviceType READ deviceType WRITE setDeviceType NOTIFY deviceTypeChanged)
+    Q_ENUMS(Type)
+    Q_PROPERTY(qmwp::DeviceTypeMessage::Type deviceType READ deviceType NOTIFY deviceTypeChanged)
+    Q_PROPERTY(QString deviceTypeStr READ deviceTypeStr NOTIFY deviceTypeChanged)
 
 public:
     enum class Type { RESERVED,
@@ -27,8 +28,10 @@ public:
     DeviceTypeMessage(QObject *parent = nullptr);
     virtual ~DeviceTypeMessage();
 
-    void setDeviceType(Type type);
+    void setDeviceType(DeviceTypeMessage::Type type);
     Type deviceType() const;
+
+    QString deviceTypeStr() const;
 
 signals:
     void deviceTypeChanged();

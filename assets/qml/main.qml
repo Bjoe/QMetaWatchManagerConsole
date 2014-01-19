@@ -3,7 +3,6 @@ import QtQuick.Controls 1.0
 import QtQuick.Window 2.0
 import QtQuick.Layouts 1.0
 import QMetaWatchManager 1.0
-//import QtBluetooth 5.2
 
 ApplicationWindow {
     id: mainWindow
@@ -39,176 +38,216 @@ ApplicationWindow {
 
         GroupBox {
             Layout.fillWidth: true
-            RowLayout {
-                Label { text: qsTr("Serial Port") }
-                ComboBox {
-                    id: portInfoComboBox
-                    textRole: "systemLocation"
-                    model: handler.model
+            Layout.minimumHeight: 30
+
+            title: qsTr("Serial Connect")
+
+            ColumnLayout {
+                anchors.fill: parent
+
+                RowLayout {
+
+                    Label { text: qsTr("Serial Port") }
+                    ComboBox {
+                        Layout.minimumWidth: 150
+                        id: portInfoComboBox
+                        textRole: "systemLocation"
+                        model: handler.model
+                    }
+
+                    Button {
+                        text: qsTr("Refresh")
+                        onClicked: handler.onRefresh();
+                    }
+                    Button {
+                        text: qsTr("Connect")
+                        onClicked: handler.onConnectPort(portInfoComboBox.currentIndex);
+                    }
                 }
 
-                Button {
-                    text: qsTr("Refresh")
-                    onClicked: handler.onRefresh();
+                TextArea {
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+
+                    id: serialOutput
+                    readOnly: true
                 }
-                Button {
-                    text: qsTr("Connect")
-                    onClicked: handler.onConnectPort(portInfoComboBox.currentIndex);
-                }
-                Button {
-                    text: qsTr("Send")
-                    onClicked: handler.onSend();
+
+                RowLayout {
+
+                    TextField {
+                        Layout.fillWidth: true
+                        id: commandField
+                    }
+
+                    Button {
+                        text: qsTr("Send")
+                        onClicked: {
+                            handler.onSend(commandField.text);
+                            commandField.text = "";
+                        }
+                    }
                 }
             }
         }
-        /*
-        GroupBox {
-            RowLayout {
-                Label { text: qsTr("Baudrate") }
-                ComboBox {
-                    id: baudrateComboBox
-                }
-
-                Label { text: qsTr("Data bits") }
-                ComboBox {
-                    id: dataBitsComboBox
-                }
-            }
-
-            RowLayout {
-                Label { text: qsTr("Flow control") }
-                ComboBox {
-                    id: flowControlComboBox
-                }
-
-                Label { text: qsTr("Parity") }
-                ComboBox {
-                    id: parityComboBox
-                }
-            }
-        } */
-
 
         GroupBox {
             Layout.fillWidth: true
             Layout.fillHeight: true
+
+            title: qsTr("Bluetooth")
+
             ColumnLayout {
+                anchors.fill: parent
+
                 id: btLayout
-                Label { id: top; text: qsTr("Bluetooth") }
 
-                Rectangle {
-                    id: busy
+                TableView {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
 
-                    width: top.width * 0.7;
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.top: top.bottom;
-                    height: 30;
-                    radius: 5
-                    color: "#1c56f3"
-                    visible: btDiscoveryHandler.running
-
-                    Text {
-                        id: text
-                        text: "Scanning"
-                        font.bold: true
-                        anchors.centerIn: parent
-                    }
-
-                    SequentialAnimation on color {
-                        id: busyThrobber
-                        ColorAnimation { easing.type: Easing.InOutSine; from: "#1c56f3"; to: "white"; duration: 1000; }
-                        ColorAnimation { easing.type: Easing.InOutSine; to: "#1c56f3"; from: "white"; duration: 1000 }
-                        loops: Animation.Infinite
-                    }
-                }
-
-                //property BluetoothDiscoveryModel btModel:
-
-                ListView {
                     id: btList
-                    height: 100;
 
                     model: btDiscoveryHandler.model
 
-                    delegate: Rectangle {
-                        id: btItem
+                    TableViewColumn {
+                        role: "name"
+                        title: "Name"
+                    }
 
-                        width: parent.width
-                        height: bttext.height + 10
-                        color: ListView.isCurrentItem ? "white" : "red"
+                    TableViewColumn {
+                        role: "deviceName"
+                        title: "Device Name"
+                    }
 
-                        //property BluetoothService btService: service
-
-
-                        Text {
-                            id: bttext
-                            text: "Name: " + name + " RemoteAddress: " + remoteAddress + " DeviceName: " + deviceName
-                        }
+                    TableViewColumn {
+                        role: "remoteAddress"
+                        title: "Remote Address"
                     }
                 }
-                Layout.fillWidth: true
 
                 RowLayout {
+
                     id: buttonGroup
 
-                    anchors.bottom: parent.bottom
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    spacing: 20
-
                     Button {
-
                         text: qsTr("Scannen")
                         onClicked: {
                             btDiscoveryHandler.discover();
-                            //btModel.running = false;
-                            //btModel.running = true
                         }
                     }
                     Button {
                         text: qsTr("Connect")
                         onClicked: {
-                            //var service = btListe.currentItem.btService;
-                            //console.log(service);
-                            //btSocket.service = service;
-                            //btSocket.connected = true;
-                            //btHandler.onConnectToDevice(service.deviceAddress);
-                            btHandler.onConnectToDevice(btDiscoveryHandler.model, btList.currentIndex);
+                            btHandler.onConnectToDevice(btDiscoveryHandler.model, btList.currentRow);
+                        }
+                    }
+                }
+            }
+        }
+
+        GroupBox {
+            Layout.fillWidth: true
+
+            title: qsTr("Watch")
+
+            ColumnLayout {
+                anchors.fill: parent
+
+                Button {
+                    text: qsTr("Send Clock")
+                    onClicked: metaWatchHandler.onSendClock();
+                }
+
+                RowLayout {
+
+                    Label { text: qsTr("Device Type")}
+
+                    Label { text: deviceTypeObject.deviceTypeStr }
+
+                    Button {
+                        text: qsTr("Get Device Type")
+                        onClicked: metaWatchHandler.onSendDeviceType();
+                    }
+                }
+
+                RowLayout {
+                    CheckBox {
+                        id: clockFormatCheckBox
+                        text: qsTr("Clock Format 24H")
+                        checked: propertyObject.clockFormatChecked
+                        onCheckedChanged: {
+                            propertyObject.clockFormatChecked = checked;
+                        }
+                    }
+
+                    CheckBox {
+                        id: secondsCheckBox
+                        text: qsTr("Seconds")
+                        checked: propertyObject.showSecondsChecked
+                        onCheckedChanged: {
+                            propertyObject.showSecondsChecked = checked;
+                        }
+                    }
+
+                    CheckBox {
+                        id: dateFormatCheckBox
+                        text: qsTr("Date format dd.mm.yyyy")
+                        checked: propertyObject.dateFormatChecked
+                        onCheckedChanged: {
+                            propertyObject.dateFormatChecked = checked;
+                        }
+                    }
+
+                    CheckBox {
+                        id: separationLineCheckBox
+                        text: qsTr("Seperation line")
+                        checked: propertyObject.showSeparationLineChecked
+                        onCheckedChanged: {
+                            propertyObject.showSeparationLineChecked = checked;
+                        }
+                    }
+
+                    CheckBox {
+                        id: backlightCheckBox
+                        text: qsTr("Backlight")
+                        checked: propertyObject.autoBacklightChecked
+                        onCheckedChanged: {
+                            propertyObject.autoBacklightChecked = checked;
+                        }
+                    }
+
+                    Button {
+                        text: qsTr("Send Property")
+                        onClicked: {
+                            propertyObject.operation = WatchPropertyOperationMessage.WRITE;
+                            metaWatchHandler.onSendProperty();
                         }
                     }
                     Button {
-                        text: qsTr("Send")
-                        onClicked: btHandler.onSend();
-                    }
-                    Button {
-                        text: qsTr("Send Clock")
-                        onClicked: btHandler.onSendClock();
-                    }
-                    Button {
-                        text: qsTr("Send Property")
-                        onClicked: btHandler.onSendProperty();
-                    }
-                    Button {
-                        text: qsTr("Send Device Type")
-                        onClicked: btHandler.onSendDeviceType();
+                        text: qsTr("Read Property")
+                        onClicked: {
+                            propertyObject.operation = WatchPropertyOperationMessage.READ;
+                            metaWatchHandler.onSendProperty();
+                        }
                     }
                 }
             }
         }
     }
 
+    property DeviceTypeMessage deviceTypeObject: metaWatchHandler.deviceTypeMessage
+    property WatchPropertyOperationMessage propertyObject: metaWatchHandler.watchProperty
+
     SerialPortHandler {
         id: handler
-    }
 
-    BluetoothPortHandler {
-        id: btHandler
-
-        onConnected: {
-            console.log("Connect to Device " + message);
+        onError: {
+            statusBarMessage.text = message;
         }
 
-        onDisconnected: {
-            console.log("Device disconnected");
+        onOutput: {
+            serialOutput.append(data);
         }
     }
 
@@ -216,60 +255,41 @@ ApplicationWindow {
         id: btDiscoveryHandler
 
         onErrorChanged: {
-            console.log("Error " + btDiscoveryHandler.error)
+            statusBarMessage.text = "Error " + btDiscoveryHandler.error;
+        }
+
+        onRunningChanged: {
+            if(btDiscoveryHandler.running) {
+                statusBarMessage.text = "Scanning ....";
+            } else {
+                statusBarMessage.text = "Scanning .... Done.";
+            }
+        }
+    }
+
+    BluetoothPortHandler {
+        id: btHandler
+
+        onConnected: {
+            metaWatchHandler.onConnect(device);
+            statusBarMessage.text = "Connect to Device";
+        }
+
+        onDisconnected: {
+            statusBarMessage.text = "Device disconnected";
+        }
+
+        onError: {
+            statusBarMessage.text = message;
+        }
+
+        onStatusMessage: {
+            statusBarMessage.text = message;
         }
     }
 
     MetaWatchHandler {
         id: metaWatchHandler
     }
-
-    /*
-        BluetoothDiscoveryModel {
-            id: btModel
-            running: false
-            discoveryMode: BluetoothDiscoveryModel.FullServiceDiscovery
-            onDiscoveryModeChanged: console.log("Discovery mode: " + discoveryMode)
-            onServiceDiscovered: {
-                console.log("Found new service device Address: " + service.deviceAddress
-                            + " Device Name: " + service.deviceName
-                            + " Service Name: " + service.serviceName
-                            + " Service Uuid: " + service.serviceUuid
-                            + " Service Description: " + service.serviceDescription
-                            + " Service Protocol: " + service.serviceProtocol);
-            }
-            onDeviceDiscovered: console.log("New device: " + device)
-        }
-
-        BluetoothSocket {
-            id: btSocket
-
-            onServiceChanged: {
-                var service = btSocket.service;
-                console.log("Service Changed" + service.deviceAddress
-                            + " Device Name: " + service.deviceName
-                            + " Service Name: " + service.serviceName
-                            + " Service Uuid: " + service.serviceUuid
-                            + " Service Description: " + service.serviceDescription
-                            + " Service Protocol: " + service.serviceProtocol);
-            }
-
-            onConnectedChanged: {
-                console.log("Connected Change: " + btSocket.connected);
-            }
-
-            onErrorChanged: {
-                console.log("Error Change: " + btSocket.error);
-            }
-
-            onStateChanged: {
-                console.log("State Change: " + btSocket.state);
-            }
-
-            onDataAvailable: {
-                console.log("Data available: " + btSocket.stringData);
-            }
-        }
-    */
 }
 
