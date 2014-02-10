@@ -31,9 +31,3 @@ set(test_additional_lib
 #)
 
 qt_test(foo exampletest.cpp)
-qt_test(MetaWatchProtocol metawatchprotocoltest.cpp)
-qt_test(DeviceTypeMessage devicetypemessagetest.cpp)
-qt_test(RealTimeClockMessage realtimeclockmessagetest.cpp)
-qt_test(WatchPropertyOperatonMessage watchpropertyoperationmessagetest.cpp)
-qt_test(Protocol protocoltest.cpp)
-qt_test(ProtocolDispatcher protocoldispatchertest.cpp)

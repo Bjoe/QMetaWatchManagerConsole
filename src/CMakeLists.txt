@@ -1,13 +1,5 @@
 
 set(QT_SRCS
-    core/metawatchprotocol.cpp
-    core/metawatchmessage.cpp
-    core/protocoldispatcher.cpp
-
-    devicetypemessage.cpp
-    realtimeclockmessage.cpp
-    watchpropertyoperationmessage.cpp
-
     gui/mainwindowcontroller.cpp
     gui/serialporthandler.cpp
     gui/portinfomodel.cpp
@@ -29,7 +21,7 @@ configure_file (
   )
 
 add_library(qmwmcore STATIC ${QT_SRCS})
-target_link_libraries(qmwmcore Qt5::Bluetooth Qt5::SerialPort Qt5::Widgets Qt5::Qml)
+target_link_libraries(qmwmcore Qt5::Bluetooth Qt5::SerialPort Qt5::Widgets Qt5::Qml ${QMWPROTOCOL_LIBRARIES})
 
 qt5_add_resources(QRC ${RESOURCES})
 add_executable(qmwm main.cpp ${QRC})

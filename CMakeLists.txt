@@ -42,6 +42,9 @@ find_package(Qt5Quick REQUIRED)
 find_package(Qt5SerialPort REQUIRED)
 find_package(Qt5Bluetooth REQUIRED)
 
+find_package(QMWProtocol REQUIRED)
+include_directories(${QMWPROTOCOL_INCLUDE_DIRS})
+
 if(${DOC})
     find_doxygen()
 endif(${DOC})
