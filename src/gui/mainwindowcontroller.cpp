@@ -13,6 +13,7 @@
 #include "gui/metawatchhandler.h"
 #include "devicetypemessage.h"
 #include "watchpropertyoperationmessage.h"
+#include "controlfullscreenmessage.h"
 
 namespace qmwm {
 namespace gui {
@@ -27,6 +28,7 @@ MainWindowController *MainWindowController::createInstance(const QString &qmlUrl
     qmlRegisterType<qmwm::gui::MetaWatchHandler>("QMetaWatchManager", 1, 0, "MetaWatchHandler");
     qmlRegisterType<qmwp::DeviceTypeMessage>("QMetaWatchManager", 1, 0, "DeviceTypeMessage");
     qmlRegisterType<qmwp::WatchPropertyOperationMessage>("QMetaWatchManager", 1, 0, "WatchPropertyOperationMessage");
+    qmlRegisterType<qmwp::ControlFullScreenMessage>("QMetaWatchManager", 1, 0, "ControlFullScreenMessage");
 
     QQmlApplicationEngine* engine = new QQmlApplicationEngine();
     initContext(engine);

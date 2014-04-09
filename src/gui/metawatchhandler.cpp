@@ -3,6 +3,8 @@
 #include <QDebug>
 
 #include "realtimeclockmessage.h"
+#include "writelcdbuffermessage.h"
+#include "setwidgetlistmessage.h"
 
 namespace qmwm {
 namespace gui {
@@ -36,6 +38,17 @@ qmwp::WatchPropertyOperationMessage* MetaWatchHandler::watchProperty() const
     return m_watchProperty;
 }
 
+void MetaWatchHandler::setFullScreenProperty(qmwp::ControlFullScreenMessage *message)
+{
+    m_fullScreenProperty = message;
+    emit fullScreenPropertyChanged();
+}
+
+qmwp::ControlFullScreenMessage *MetaWatchHandler::fullScreenProperty() const
+{
+    return m_fullScreenProperty;
+}
+
 void MetaWatchHandler::onConnect(QIODevice *device)
 {
     m_dispatcher.initializeDevice(device);
@@ -55,6 +68,24 @@ void MetaWatchHandler::onSendProperty()
 void MetaWatchHandler::onSendDeviceType()
 {
     m_dispatcher.send(m_deviceTypeMessage);
+}
+
+void MetaWatchHandler::onSendFullScreen()
+{
+    m_dispatcher.send(m_fullScreenProperty);
+}
+
+void MetaWatchHandler::onSendWriteBuffer()
+{
+    qmwp::WriteLcdBufferMessage message;
+    message.test();
+
+    m_dispatcher.send(&message);
+}
+
+void MetaWatchHandler::onSendSetWidgetList()
+{
+    m_screenHandler->onSendSetWidgetList(&m_dispatcher);
 }
 
 } // namespace gui

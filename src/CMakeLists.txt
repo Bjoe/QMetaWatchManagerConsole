@@ -7,6 +7,7 @@ set(QT_SRCS
     gui/bluetoothdiscoverymodel.cpp
     gui/bluetoothdiscoveryhandler.cpp
     gui/metawatchhandler.cpp
+    gui/metawatchscreenhandler.cpp
 )
 
 set(RESOURCES ../resources.qrc)

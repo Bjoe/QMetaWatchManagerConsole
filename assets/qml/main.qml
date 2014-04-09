@@ -232,12 +232,41 @@ ApplicationWindow {
                         }
                     }
                 }
+
+                RowLayout {
+
+                    Label { text: qsTr("Controll full screen")}
+
+                    CheckBox {
+                        text: "Full Screen"
+                        checked: fullScreenObject.fullScreenChecked
+                        onCheckedChanged: {
+                            fullScreenObject.fullScreenChecked = checked;
+                        }
+                    }
+
+                    Button {
+                        text: qsTr("Send Full Screen")
+                        onClicked: metaWatchHandler.onSendFullScreen();
+                    }
+                }
+
+                Button {
+                    text: qsTr("Send Write Buffer")
+                    onClicked: metaWatchHandler.onSendWriteBuffer();
+                }
+
+                Button {
+                    text: qsTr("Set CLocks via SetWidgetList")
+                    onClicked: metaWatchHandler.onSendSetWidgetList();
+                }
             }
         }
     }
 
     property DeviceTypeMessage deviceTypeObject: metaWatchHandler.deviceTypeMessage
     property WatchPropertyOperationMessage propertyObject: metaWatchHandler.watchProperty
+    property ControlFullScreenMessage fullScreenObject: metaWatchHandler.fullScreenProperty
 
     SerialPortHandler {
         id: handler
